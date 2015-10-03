@@ -70,7 +70,7 @@
 				})
 			
 		
-			$(document).on('click', '.del-btn', function(){
+			$(document).on('click', '.del-btn', function(){         // $(document).on() not $("#xx").on('click',xx)
 				$.getJSON('/delete', {
 					'name': $(this).parent().prev().prev().text()
 				},function(res){
