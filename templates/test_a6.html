@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+	<head>
+		<meta charset="utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<title>Document</title>
+   		<link rel="stylesheet" href="../static/css/bootstrap.min.css">  
+	</head>
+	<body>
+		<div class="row">
+			<div class="col-md-5" id="left-bar">				
+				name:<input type="text" name="name" id="name-input">
+				age:<input type="text" name="age" id="age-input">
+				<button id="ref-btn" class="btn btn-default">Add</button>
+			</div>
+			<div class="col-md-7">
+				<p id="p-show"></p>
+				<table id="right-table" class="table table-bordered">				
+					<tr><td>name</td><td>age</td><td>config</td></tr>	
+				</table>
+			</div>
+		</div>
+		
+		<script src="../static/jquery.js"></script>
+		<script src="../static/js/bootstrap.min.js"></script>
+		<script>
+			
+			var str = ''			
+			$.getJSON('/get_data',function(res){				
+				$.each(res, function(index, value){	
+					// str = str + '<tr><td>' + value['name'] + '</td><td>' + value['age'] + '</td><td><button class="btn btn-info del-btn">delete</button></td></tr>'
+					str = str + '<tr><td id='+ value['name'] +'>' + value['name'] + '</td><td>' + value['age'] + '</td><td><button class="btn btn-info del-btn">delete</button></td></tr>'
+				})
+				$('#right-table').append(str)
+				console.log(res)
+			})
+
+			
+			$(document).on('click', '#ref-btn', function(){
+				$.getJSON('/add', {
+					'name': $('#name-input').val(),
+					'age': $('#age-input').val()		
+					}, function(res){
+						var str_ref = ''
+						$.each(res, function(index, value){
+							if(value['name'] === 'not_full_input'){
+								$('#p-show').text(value['age'])
+								return 
+								}else if(value['name'] == 'name_repeat'){
+									$('#p-show').empty()
+									return
+								}
+								else{
+									$('#p-show').empty()
+									// str_ref = '<tr><td>' + value['name'] + '</td><td>' + value['age'] + '</td><td><button class="btn btn-info del-btn">delete</button></td></tr>'  
+									str_ref = '<tr><td id='+ value['name'] +'>' + value['name'] + '</td><td>' + value['age'] + '</td><td><button class="btn btn-info del-btn">delete</button></td></tr>'
+									$('#right-table').append(str_ref)
+									return 
+								}
+								// str_ref = '<tr><td>' + value['name'] + '</td><td>' + value['age'] + '</td><td><button class="btn btn-info del-btn">delete</button></td></tr>'
+								$('#' + value['name']).parent().remove()  
+								str_ref = '<tr><td id='+ value['name'] +'>' + value['name'] + '</td><td>' + value['age'] + '</td><td><button class="btn btn-info del-btn">delete</button></td></tr>'
+									
+									$('#right-table').append(str_ref)
+
+						})
+					})
+																	
+				})
+			
+		
+			$(document).on('click', '.del-btn', function(){
+				$.getJSON('/delete', {
+					'name': $(this).parent().prev().prev().text()
+				},function(res){
+						
+				})
+				$(this).parent().parent().remove()
+				
+				
+			})
+		</script>
+	</body>
+</html>
